@@ -5,7 +5,7 @@
 class PointerRequester
 {
 public:
-	PointerRequester(const DumbRequests& dumb_requests, RequestPointers request_pointers);
+	PointerRequester(RequestPointers request_pointers);
 	void RequestBasicRequest();
 
 	~PointerRequester();

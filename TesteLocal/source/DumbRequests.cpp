@@ -1,21 +1,21 @@
 #include "DumbRequests.h"
 
-void DumbRequests::BasicRequest()
+void DumbRequests::BasicRequest() const
 {
     Basic_Called_Counter++;
 }
 
-void DumbRequests::DataReceiveRequest()
+DataExample DumbRequests::DataReceiveRequest() const
 {
     Data_Receive_Called_Counter++;
 }
 
-void DumbRequests::DataTransmitRequest()
+void DumbRequests::DataTransmitRequest(DataExample trasnmited) const
 {
     Data_Trasmit_Called_Counter++;
 }
 
-void DumbRequests::DataTranscieveRequest()
+DataExample DumbRequests::DataTranscieveRequest(DataExample trasnmited) const
 {
     Data_Transcieve_Called_Counter++;
 }

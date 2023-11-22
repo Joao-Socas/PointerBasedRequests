@@ -4,7 +4,7 @@ SwitchRequestResponder::SwitchRequestResponder(const DumbRequests& dumb_requests
 {
 }
 
-void SwitchRequestResponder::Request(SwitchRequest request)
+DataExample SwitchRequestResponder::Request(SwitchRequest request) const
 {
 	switch (request.Request_Code)
 	{
@@ -12,12 +12,14 @@ void SwitchRequestResponder::Request(SwitchRequest request)
 		Dumb_Requests.BasicRequest();
 		break;
 	case REQUEST_CODES::DATA_RECEIVE:
+		return Dumb_Requests.DataReceiveRequest();
 		break;
 	case REQUEST_CODES::DATA_TRANSMIT:
+		Dumb_Requests.DataTransmitRequest(request.Data_Example);
 		break;
 	case REQUEST_CODES::DATA_TRANSCEIVE:
-		break;
-	default:
+		return Dumb_Requests.DataTranscieveRequest(request.Data_Example);
 		break;
 	}
+	return DataExample{};
 }

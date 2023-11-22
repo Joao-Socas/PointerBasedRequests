@@ -12,9 +12,9 @@ enum class REQUEST_CODES
 struct RequestPointers
 {
     std::function<void()> Basic_Request_Pointer;
-    std::function<void()> Data_Receive_Request_Pointer;
-    std::function<void()> Data_Transmit_Request_Pointer;
-    std::function<void()> Data_Transceive_Request_Pointer;
+    std::function<DataExample()> Data_Receive_Request_Pointer;
+    std::function<void(DataExample)> Data_Transmit_Request_Pointer;
+    std::function<DataExample(DataExample)> Data_Transceive_Request_Pointer;
 };
 
 struct DataExample
@@ -30,6 +30,6 @@ struct SwitchRequest
 
 struct PointerRequest
 {
-    std::function<void()> Request_Pointer;
+    std::function<void(PointerRequest&)> Request_Pointer;
     DataExample Data_Example;
 };

@@ -6,7 +6,7 @@ class SwitchRequestResponder
 {
 public:
 	SwitchRequestResponder(const DumbRequests& dumb_request);
-	void Request(SwitchRequest request);
+	DataExample Request(SwitchRequest request) const;
 
 private:
 	const DumbRequests& Dumb_Requests;
