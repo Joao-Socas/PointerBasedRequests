@@ -104,7 +104,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)header</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)header;$(SolutionDir)..\boost\boost_1_83;$(SolutionDir)Common</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -119,7 +120,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)header</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)header;$(SolutionDir)..\boost\boost_1_83;$(SolutionDir)Common</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,6 +132,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Server.cpp" />
+    <ClCompile Include="source\ConnectionBroadcaster.cpp" />
+    <ClCompile Include="source\RequestRoutines.cpp" />
+    <ClCompile Include="source\ServerConnection.cpp" />
+    <ClCompile Include="source\PointerRequestReceiver.cpp" />
+    <ClCompile Include="source\SwitchRequestReceiver.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="header\ConnectionBroadcaster.h" />
+    <ClInclude Include="header\PointerRequestReceiver.h" />
+    <ClInclude Include="header\ServerConnection.h" />
+    <ClInclude Include="header\SwitchRequestReceiver.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
