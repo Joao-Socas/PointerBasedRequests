@@ -18,12 +18,6 @@
     <ClCompile Include="TesteLocal.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\PointerRequester.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\SwitchRequester.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\DumbRequests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -41,13 +35,7 @@
     <ClInclude Include="header\DumbRequests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="header\PointerRequester.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="header\PointerRequestResponder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="header\SwitchRequester.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="header\SwitchRequestResponder.h">

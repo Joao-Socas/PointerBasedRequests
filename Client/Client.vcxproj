@@ -132,10 +132,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp" />
+    <ClCompile Include="source\BroadcastListener.cpp" />
     <ClCompile Include="source\ClientConnection.cpp" />
+    <ClCompile Include="source\PointerRequester.cpp" />
+    <ClCompile Include="source\SwitchRequester.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="header\BroadcastListener.h" />
     <ClInclude Include="header\ClientConnection.h" />
+    <ClInclude Include="header\PointerRequester.h" />
+    <ClInclude Include="header\SwitchRequester.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

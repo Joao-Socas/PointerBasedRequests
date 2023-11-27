@@ -21,9 +21,27 @@
     <ClCompile Include="source\ClientConnection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\BroadcastListener.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\PointerRequester.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\SwitchRequester.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="header\ClientConnection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="header\BroadcastListener.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="header\SwitchRequester.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="header\PointerRequester.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

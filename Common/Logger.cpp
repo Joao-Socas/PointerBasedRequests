@@ -2,7 +2,13 @@
 
 // STD Includes
 #include <iostream>
+#include <ranges>
 #include <algorithm>
+
+//Windows Includes
+#ifdef _CONSOLE
+#include <conio.h>
+#endif
 
 constexpr auto CLEAR_LINE = "\u001b[2k\u001b[1F";
 
@@ -31,19 +37,61 @@ void Logger::ReplacebleMessage(std::string message)
 {
     uint32_t lines = std::ranges::count(message, '\n');
     message.append("\n");
-    
+
     CleanLines(Replaceble_Message_Lines + 1);
     Last_Replaced_Message = message;
     std::cout << message.c_str();
-    
+
     Replace = true;
     Replaceble_Message_Lines = lines;
 }
 
-void Logger::AcceptQuestion(std::string question)
+bool Logger::AcceptQuestion(std::string question, bool append_replace)
 {
-    Replace = false;
     question.append("\n Press Y for yes, and N for no:\n");
+    
+    if (append_replace)
+    {
+        Replaceble_Message_Lines += std::ranges::count(question, '\n');
+        Last_Replaced_Message.append(question);
+    }
+    else
+    {
+        Replace = false;
+    }
+
+    char option = NULL;
+    while (true)
+    {
+        option = _getch();
+        if (option == 'y' || option == 'Y')
+        {
+            return true; // Yes
+        }
+        if (option == 'n' || option == 'N')
+        {
+            return false; // No
+        }
+    }
+}
+
+bool Logger::OptionQuestion(std::string question, bool append_replace, std::function<bool(char)>validate_callback)
+{
+    if (append_replace)
+    {
+        Replaceble_Message_Lines += std::ranges::count(question, '\n');
+        Last_Replaced_Message.append(question);
+    }
+    else
+    {
+        Replace = false;
+    }
+
+    char option = NULL;
+    do
+    {
+        option = _getch();
+    } while (!validate_callback(option));
 
 }
 
@@ -56,4 +104,3 @@ void Logger::CleanLines(uint32_t lines)
     }
     std::cout << clear_line.c_str();
 }
-

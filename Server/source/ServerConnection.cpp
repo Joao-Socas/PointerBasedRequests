@@ -16,9 +16,9 @@ ServerConnection::ServerConnection(std::function<void()>& cancel_connection) : C
 
 void ServerConnection::StartConnection() 
 {
-	Server_ConnectionLoop_Context.post(boost::bind(&ServerConnection::WaitForConnection, this));
-	Server_ConnectionLoop_Context.restart();
-	Server_ConnectionLoop_Context.run();
+	Connection_Loop_Context.post(boost::bind(&ServerConnection::WaitForConnection, this));
+	Connection_Loop_Context.restart();
+	Connection_Loop_Context.run();
 }
 
 void ServerConnection::WaitForConnection()
@@ -49,7 +49,7 @@ void ServerConnection::WaitForConnection()
 		Connection_Socket->set_option(boost::asio::ip::tcp::no_delay(true));
 		ConnectionProposal();
 	}
-	Server_ConnectionLoop_Context.post(boost::bind(&ServerConnection::WaitForConnection, this));
+	Connection_Loop_Context.post(boost::bind(&ServerConnection::WaitForConnection, this));
 }
 
 void ServerConnection::CancelConnection()
@@ -147,24 +147,41 @@ void ServerConnection::ConnectionProposalCheck(char* buffer)
 {
 	ClientConnectionParams Client_Params;
 	memcpy(&Client_Params, buffer, sizeof(Client_Params));
-	boost::system::error_code error_code;
+	boost::system::error_code connection_error;
 	char answer_buffer = Logger::AcceptQuestion(std::string("Accept connection from client ").append(Client_Params.Friendly_Name)); //TODO change this if negate is a possibility
-	boost::asio::async_write(*Connection_Socket.get(), boost::asio::buffer(&answer_buffer, 1), [&error_code](const boost::system::error_code& error, std::size_t)
+	boost::asio::async_write(*Connection_Socket.get(), boost::asio::buffer(&answer_buffer, 1), [&connection_error](const boost::system::error_code& error, std::size_t)
 	{
-		error_code = error;
+			connection_error = error;
 	});
 	Connection_Context.restart();
 	Connection_Context.run();
 
-	if (!error_code)
+	if (!connection_error)
 	{
 		Connected = true;
 		Logger::UpdateMessage("Connected");
+
+		Acceptor->async_accept(Connection_Context, [this, &connection_error](const boost::system::error_code& error, boost::asio::ip::tcp::socket new_socket)
+			{
+				connection_error = error;
+				Pointer_Request_Socket = std::make_unique<boost::asio::ip::tcp::socket>(std::move(new_socket));
+			});
+		Connection_Context.restart();
+		Connection_Context.run();
+		Acceptor->async_accept(Connection_Context, [this, &connection_error](const boost::system::error_code& error, boost::asio::ip::tcp::socket new_socket)
+			{
+				connection_error = error;
+				Switch_Request_Socket = std::make_unique<boost::asio::ip::tcp::socket>(std::move(new_socket));
+			});
+		Connection_Context.restart();
+		Connection_Context.run();
+
+
         ScoutConnection();
 	}
-	if (error_code)
+	if (connection_error)
 	{
-		Logger::UpdateMessage(std::string("Connection error: ").append(error_code.what()));
+		Logger::UpdateMessage(std::string("Connection error: ").append(connection_error.what()));
 	}
 }
 

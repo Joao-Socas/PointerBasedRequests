@@ -2,13 +2,16 @@
 // STD Icludes
 #include <string>
 #include <cstdint>
+#include <functional>
+
 
 class Logger
 {
 public:
 	static void UpdateMessage(std::string message, bool end_replace = false);
 	static void ReplacebleMessage(std::string message);
-	static void AcceptQuestion(std::string question);
+	static bool AcceptQuestion(std::string question, bool append_replace = false);
+	static bool OptionQuestion(std::string question, bool append_replace, std::function<bool(char)>validate_callback);
 
 private:
 	static void CleanLines(uint32_t lines);

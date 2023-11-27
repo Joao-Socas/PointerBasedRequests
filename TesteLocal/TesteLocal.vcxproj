@@ -198,9 +198,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\DumbRequests.cpp" />
-    <ClCompile Include="source\PointerRequester.cpp" />
     <ClCompile Include="source\PointerRequestResponder.cpp" />
-    <ClCompile Include="source\SwitchRequester.cpp" />
     <ClCompile Include="source\SwitchRequestResponder.cpp" />
     <ClCompile Include="TesteLocal.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -215,9 +213,7 @@
   <ItemGroup>
     <ClInclude Include="header\CommonStructures.h" />
     <ClInclude Include="header\DumbRequests.h" />
-    <ClInclude Include="header\PointerRequester.h" />
     <ClInclude Include="header\PointerRequestResponder.h" />
-    <ClInclude Include="header\SwitchRequester.h" />
     <ClInclude Include="header\SwitchRequestResponder.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

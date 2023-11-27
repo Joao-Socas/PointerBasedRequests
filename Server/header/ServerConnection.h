@@ -30,15 +30,17 @@ private:
 		
 	ConnectionBroadcaster Connection_Broadcaster;
 	boost::asio::io_context Connection_Context;
+	boost::asio::io_context Connection_Loop_Context;
 	boost::asio::io_context Request_Context;
 	std::unique_ptr<boost::asio::ip::tcp::endpoint> Server_Endpoint;
 	std::unique_ptr<boost::asio::ip::tcp::acceptor> Acceptor;
 	std::unique_ptr<boost::asio::ip::tcp::socket> Connection_Socket;
-	std::unique_ptr<boost::asio::ip::tcp::socket> Request_Socket;
+	std::unique_ptr<boost::asio::ip::tcp::socket> Pointer_Request_Socket;
+	std::unique_ptr<boost::asio::ip::tcp::socket> Switch_Request_Socket;
 
 
 
-	boost::asio::io_context Server_ConnectionLoop_Context;
+
 	void WaitForConnection();
 	uint32_t Sync_ID = 0; // this is for preventing async rotines to continue if a cancel/disconnect was requested from the UI
 
