@@ -1,17 +1,19 @@
 #pragma once
 #include "CommonStructures.h"
-#include "SwitchRequestResponder.h"
+#include "ClientConnection.h"
 
 class SwitchRequester
 {
 public:
-	SwitchRequester(const SwitchRequestResponder& switch_request_responder);
+	SwitchRequester(ClientConnection& client_connection);
 
-	void RequestBasicRequest();
-	DataExample RequestDataReceiveRequest();
-	void RequestDataTransmitRequest(DataExample);
-	DataExample RequestDataTransceiveRequest(DataExample);
+	void RequestBasicRequestA();
+	void RequestBasicRequestB();
+	void RequestBasicRequestC();
+	//DataExample RequestDataReceiveRequest();
+	//void RequestDataTransmitRequest(DataExample);
+	//DataExample RequestDataTransceiveRequest(DataExample);
 
 private:
-	const SwitchRequestResponder& Switch_Request_Responder;
+	ClientConnection& Client_Connection
 };

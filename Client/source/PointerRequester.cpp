@@ -5,7 +5,17 @@ PointerRequester::PointerRequester(RequestPointers request_pointers, ClientConne
 {
 }
 
-void PointerRequester::RequestBasicRequest()
+void PointerRequester::RequestBasicRequestA()
 {
-    Pointer_Request_Responder.Request(PointerRequest{.Request_Pointer = Request_Pointers.Basic_Request_Pointer})
+    Client_Connection.PointerRequestSend(reinterpret_cast<char*>(Request_Pointers.Basic_Request_Pointer_A), sizeof(Request_Pointers.Basic_Request_Pointer_A));
+}
+
+void PointerRequester::RequestBasicRequestB()
+{
+    Client_Connection.PointerRequestSend(reinterpret_cast<char*>(Request_Pointers.Basic_Request_Pointer_B), sizeof(Request_Pointers.Basic_Request_Pointer_B));
+}
+
+void PointerRequester::RequestBasicRequestC()
+{
+    Client_Connection.PointerRequestSend(reinterpret_cast<char*>(Request_Pointers.Basic_Request_Pointer_C), sizeof(Request_Pointers.Basic_Request_Pointer_C));
 }

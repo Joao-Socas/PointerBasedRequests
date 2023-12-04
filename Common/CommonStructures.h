@@ -29,10 +29,12 @@ struct ClientConnectionParams
 
 enum class REQUEST_CODES
 {
-    BASIC,
-    DATA_RECEIVE,
-    DATA_TRANSMIT,
-    DATA_TRANSCEIVE
+    BASIC_A,
+    BASIC_B,
+    BASIC_C
+    //DATA_RECEIVE,
+    //DATA_TRANSMIT,
+    //DATA_TRANSCEIVE
 };
 
 struct DataExample
@@ -42,10 +44,12 @@ struct DataExample
 
 struct RequestPointers
 {
-    std::function<void* ()> Basic_Request_Pointer;
-    std::function<void* ()> Data_Receive_Request_Pointer;
-    std::function<void* (DataExample)> Data_Transmit_Request_Pointer;
-    std::function<void* (DataExample)> Data_Transceive_Request_Pointer;
+    std::function<void ()>* Basic_Request_Pointer_A;
+    std::function<void ()>* Basic_Request_Pointer_B;
+    std::function<void ()>* Basic_Request_Pointer_C;
+    //std::function<void* ()> Data_Receive_Request_Pointer;
+    //std::function<void* (DataExample)> Data_Transmit_Request_Pointer;
+    //std::function<void* (DataExample)> Data_Transceive_Request_Pointer;
 };
 
 struct SwitchRequest

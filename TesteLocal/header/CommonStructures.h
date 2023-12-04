@@ -3,10 +3,12 @@
 
 enum class REQUEST_CODES
 {
-    BASIC,
-    DATA_RECEIVE,
-    DATA_TRANSMIT,
-    DATA_TRANSCEIVE
+    BASIC_A,
+    BASIC_B,
+    BASIC_C
+    //DATA_RECEIVE,
+    //DATA_TRANSMIT,
+    //DATA_TRANSCEIVE
 };
 
 struct DataExample

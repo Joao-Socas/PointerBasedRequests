@@ -98,6 +98,26 @@ void ClientConnection::Connect(BroadcastData broadcast_data)
     return;
 }
 
+void ClientConnection::PointerRequestSend(char* buffer, std::size_t buffer_size)
+{
+    boost::system::error_code connection_error;
+    boost::asio::write(*Pointer_Request_Socket, boost::asio::buffer(&buffer, buffer_size), connection_error);
+    if (connection_error)
+    {
+        Logger::UpdateMessage(std::string("Error making pointer request: ").append(connection_error.what()).c_str());
+    }
+}
+
+void ClientConnection::SwitchRequestSend(char* buffer, std::size_t buffer_size)
+{
+    boost::system::error_code connection_error;
+    boost::asio::write(*Switch_Request_Socket, boost::asio::buffer(&buffer, buffer_size), connection_error);
+    if (connection_error)
+    {
+        Logger::UpdateMessage(std::string("Error making switch request: ").append(connection_error.what()).c_str());
+    }
+}
+
 bool ClientConnection::TimeoutConnect(boost::asio::ip::tcp::socket& socket, boost::asio::io_context& io_context, boost::asio::ip::tcp::endpoint& endpoint)
 {
     boost::asio::deadline_timer timer(io_context);

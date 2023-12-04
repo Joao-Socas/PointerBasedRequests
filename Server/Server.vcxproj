@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClInclude Include="header\ConnectionBroadcaster.h" />
     <ClInclude Include="header\PointerRequestReceiver.h" />
+    <ClInclude Include="header\RequestRoutines.h" />
     <ClInclude Include="header\ServerConnection.h" />
     <ClInclude Include="header\SwitchRequestReceiver.h" />
   </ItemGroup>

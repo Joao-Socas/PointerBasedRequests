@@ -54,7 +54,6 @@ void ServerConnection::WaitForConnection()
 
 void ServerConnection::CancelConnection()
 {
-	Sync_ID++;
 	if (Connection_Broadcaster.Is_Broadcasting)
 	{
 		Connection_Broadcaster.StopBroadcastIP();
@@ -161,14 +160,14 @@ void ServerConnection::ConnectionProposalCheck(char* buffer)
 		Connected = true;
 		Logger::UpdateMessage("Connected");
 
-		Acceptor->async_accept(Connection_Context, [this, &connection_error](const boost::system::error_code& error, boost::asio::ip::tcp::socket new_socket)
+		Acceptor->async_accept(Pointer_Request_Context, [this, &connection_error](const boost::system::error_code& error, boost::asio::ip::tcp::socket new_socket)
 			{
 				connection_error = error;
 				Pointer_Request_Socket = std::make_unique<boost::asio::ip::tcp::socket>(std::move(new_socket));
 			});
 		Connection_Context.restart();
 		Connection_Context.run();
-		Acceptor->async_accept(Connection_Context, [this, &connection_error](const boost::system::error_code& error, boost::asio::ip::tcp::socket new_socket)
+		Acceptor->async_accept(Switch_Request_Context, [this, &connection_error](const boost::system::error_code& error, boost::asio::ip::tcp::socket new_socket)
 			{
 				connection_error = error;
 				Switch_Request_Socket = std::make_unique<boost::asio::ip::tcp::socket>(std::move(new_socket));
@@ -208,4 +207,84 @@ void ServerConnection::ScoutConnection()
 		timer.expires_from_now(TIMEOUT_LIMIT/2);
 		timer.wait();
 	}
+}
+
+void ServerConnection::StartListeningRequests()
+{
+	Should_Hear_Requests = true;
+
+	Switch_Loop_Context.post(boost::bind(&ServerConnection::ListenSwitchRequest, this));
+	Switch_Request_Thread = std::make_unique<std::thread>([this]
+	{
+		Switch_Loop_Context.restart();
+		Switch_Loop_Context.run();
+	});
+
+	Pointer_Loop_Context.post(boost::bind(&ServerConnection::ListenPointerRequest, this));
+	Pointer_Request_Thread = std::make_unique<std::thread>([this]
+	{
+		Pointer_Loop_Context.restart();
+		Pointer_Loop_Context.run();
+	});
+}
+
+void ServerConnection::StopListeningRequests()
+{
+	Should_Hear_Requests = false;
+	Switch_Request_Socket->close();
+	Pointer_Request_Socket->close();
+	Switch_Request_Context.stop();
+	Pointer_Loop_Context.stop();
+	Switch_Request_Thread->join();
+	Pointer_Request_Thread->join();
+}
+
+void ServerConnection::ListenSwitchRequest()
+{
+	boost::system::error_code error_code;
+	REQUEST_CODES requested_code;
+	boost::asio::async_read(*Switch_Request_Socket, boost::asio::buffer(&requested_code, sizeof(requested_code)), [this, &error_code](boost::system::error_code error, std::size_t)
+		{
+			error_code = error;
+			if (error && Should_Hear_Requests)
+			{
+				Logger::UpdateMessage(std::string("Error recieving switch request from driver: ").append(error_code.what()));
+			}
+		});
+	Switch_Request_Context.restart();
+	Switch_Request_Context.run();
+
+	if (error_code)
+	{
+		return;
+	}
+
+	Switch_Loop_Context.post(boost::bind(&ServerConnection::ListenSwitchRequest, this));
+}
+
+void ServerConnection::ListenPointerRequest()
+{
+	boost::system::error_code error_code;
+
+	std::function<void()>* requested_method;
+	boost::asio::async_read(*Pointer_Request_Socket, boost::asio::buffer(&requested_method, sizeof(requested_method)), [this, &error_code](boost::system::error_code error, std::size_t)
+		{
+			error_code = error;
+			if (error && Should_Hear_Requests)
+			{
+				Logger::UpdateMessage(std::string("Error recieving pointer request from driver: ").append(error_code.what()));
+			}
+		});
+	Pointer_Request_Context.restart();
+	Pointer_Request_Context.run();
+
+	if (error_code)
+	{
+		return;
+	}
+
+	// Timer start
+	(*requested_method)();
+	
+	Pointer_Loop_Context.post(boost::bind(&ServerConnection::ListenPointerRequest, this));
 }

@@ -26,25 +26,33 @@ private:
 
 	void ConnectionProposalCheck(char* buffer);
 
+	void WaitForConnection();
 	void ScoutConnection();
+	void StartListeningRequests();
+	void StopListeningRequests();
 		
 	ConnectionBroadcaster Connection_Broadcaster;
 	boost::asio::io_context Connection_Context;
 	boost::asio::io_context Connection_Loop_Context;
-	boost::asio::io_context Request_Context;
 	std::unique_ptr<boost::asio::ip::tcp::endpoint> Server_Endpoint;
 	std::unique_ptr<boost::asio::ip::tcp::acceptor> Acceptor;
 	std::unique_ptr<boost::asio::ip::tcp::socket> Connection_Socket;
-	std::unique_ptr<boost::asio::ip::tcp::socket> Pointer_Request_Socket;
+
+	boost::asio::io_context Switch_Request_Context;
+	boost::asio::io_context Switch_Loop_Context;
+	boost::asio::io_context Pointer_Request_Context;
+	boost::asio::io_context Pointer_Loop_Context;
 	std::unique_ptr<boost::asio::ip::tcp::socket> Switch_Request_Socket;
+	std::unique_ptr<boost::asio::ip::tcp::socket> Pointer_Request_Socket;
+	std::unique_ptr<std::thread>Switch_Request_Thread;
+	std::unique_ptr<std::thread>Pointer_Request_Thread;
 
-
-
-
-	void WaitForConnection();
-	uint32_t Sync_ID = 0; // this is for preventing async rotines to continue if a cancel/disconnect was requested from the UI
+	void ListenSwitchRequest();
+	void ListenPointerRequest();
 
 	bool Connected = false;
 	bool KeepAlive = true;
 	std::function<void()>& Cancel_Connection;
+
+	bool Should_Hear_Requests = false;
 };

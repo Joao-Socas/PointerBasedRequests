@@ -20,6 +20,8 @@ public:
 	~ClientConnection();
 
 	void Connect(BroadcastData broadcast_data);
+	void PointerRequestSend(char* buffer, std::size_t buffer_size);
+	void SwitchRequestSend(char* buffer, std::size_t buffer_size);
 
 private:
 	bool TimeoutConnect(boost::asio::ip::tcp::socket& socket, boost::asio::io_context& io_context, boost::asio::ip::tcp::endpoint& endpoint);
@@ -29,12 +31,12 @@ private:
 	BroadcastListener Broadcast_Listener;
 
 	boost::asio::io_context Connection_Context;
-	boost::asio::io_context Request_Context;
 
-	std::unique_ptr<boost::asio::ip::tcp::endpoint> Server_Endpoint;
-	std::unique_ptr<boost::asio::ip::tcp::socket> Server_Socket;
 	std::unique_ptr<boost::asio::ip::tcp::socket> Pointer_Request_Socket;
 	std::unique_ptr<boost::asio::ip::tcp::socket> Switch_Request_Socket;
+	boost::asio::io_context Request_Context;
+	std::unique_ptr<boost::asio::ip::tcp::endpoint> Server_Endpoint;
+	std::unique_ptr<boost::asio::ip::tcp::socket> Server_Socket;
 	std::unique_ptr<std::thread> Keep_Server_Connection_Alive_Thread;
 
 	bool Connected = false;
@@ -42,3 +44,4 @@ private:
 	ClientConnectionParams ConnectionParams = {};
 
 };
+

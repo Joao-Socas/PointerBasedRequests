@@ -6,7 +6,9 @@ class PointerRequester
 {
 public:
 	PointerRequester(RequestPointers request_pointers, ClientConnection& client_connection);
-	void RequestBasicRequest();
+	void RequestBasicRequestA();
+	void RequestBasicRequestB();
+	void RequestBasicRequestC();
 
 private:
 	RequestPointers Request_Pointers;
