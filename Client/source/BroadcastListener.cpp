@@ -45,7 +45,7 @@ BroadcastData BroadcastListener::ChooseServer()
         if (option > 47 && option < 58 && (option - 48) < Broadcast_Poll.size())
         {
             selected_id = option - 48;
-            return true; // EXIT
+            return true;
         }
         return false;
     };
@@ -107,7 +107,7 @@ void BroadcastListener::ListenBroadcastThread()
                 }
                 broadcast_adress_string.append("255");
 
-                broadcast_server_endpoint = boost::asio::ip::udp::endpoint(boost::asio::ip::address::from_string(broadcast_adress_string), PORT);
+                broadcast_server_endpoint = boost::asio::ip::udp::endpoint(boost::asio::ip::address::from_string(broadcast_adress_string), Port);
             }
         }
 

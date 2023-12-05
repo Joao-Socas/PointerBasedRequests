@@ -1,14 +1,16 @@
-#include "iostream"
+#include <iostream>
+#include <chrono>
+
 #include "boost/bind.hpp"
 
 #include "ServerConnection.h"
 
-constexpr auto TIMEOUT_LIMIT = boost::posix_time::millisec(600);
+constexpr auto TIMEOUT_LIMIT = boost::posix_time::millisec(1000);
 constexpr auto BROADCAST_INTERVAL = std::chrono::milliseconds(1000);
 constexpr int PORT = 27652;
 constexpr IPVersion IP_Version = IPVersion::IPV4;
 
-ServerConnection::ServerConnection(std::function<void()>& cancel_connection) : Cancel_Connection(cancel_connection), Connection_Broadcaster(PORT)
+ServerConnection::ServerConnection() : Connection_Broadcaster(PORT)
 {
 	Server_Endpoint = std::make_unique <boost::asio::ip::tcp::endpoint>(boost::asio::ip::tcp::v4(), PORT);
 	Acceptor = std::make_unique <boost::asio::ip::tcp::acceptor>(Connection_Context, *Server_Endpoint.get());
@@ -65,8 +67,6 @@ void ServerConnection::CancelConnection()
 	Acceptor->cancel();
 	Acceptor->close();
 }
-
-
 
 void ServerConnection::ConnectionProposal()
 {
@@ -158,15 +158,7 @@ void ServerConnection::ConnectionProposalCheck(char* buffer)
 	if (!connection_error)
 	{
 		Connected = true;
-		Logger::UpdateMessage("Connected");
 
-		Acceptor->async_accept(Pointer_Request_Context, [this, &connection_error](const boost::system::error_code& error, boost::asio::ip::tcp::socket new_socket)
-			{
-				connection_error = error;
-				Pointer_Request_Socket = std::make_unique<boost::asio::ip::tcp::socket>(std::move(new_socket));
-			});
-		Connection_Context.restart();
-		Connection_Context.run();
 		Acceptor->async_accept(Switch_Request_Context, [this, &connection_error](const boost::system::error_code& error, boost::asio::ip::tcp::socket new_socket)
 			{
 				connection_error = error;
@@ -174,8 +166,25 @@ void ServerConnection::ConnectionProposalCheck(char* buffer)
 			});
 		Connection_Context.restart();
 		Connection_Context.run();
+		Acceptor->async_accept(Pointer_Request_Context, [this, &connection_error](const boost::system::error_code& error, boost::asio::ip::tcp::socket new_socket)
+			{
+				connection_error = error;
+				Pointer_Request_Socket = std::make_unique<boost::asio::ip::tcp::socket>(std::move(new_socket));
+			});
+		Connection_Context.restart();
+		Connection_Context.run();
 
+		boost::system::error_code error;
+		boost::asio::write(*Pointer_Request_Socket.get(), boost::asio::buffer(&Pointer_Request_Receiver.Request_Pointers, sizeof(Pointer_Request_Receiver.Request_Pointers)), error);
+		if (error)
+		{
+			Connected = false;
+			std::cout << error.what().c_str() << '\n';
+			return;
+		}
 
+		Logger::UpdateMessage("Connected");
+		StartListeningRequests();
         ScoutConnection();
 	}
 	if (connection_error)
@@ -242,8 +251,10 @@ void ServerConnection::StopListeningRequests()
 void ServerConnection::ListenSwitchRequest()
 {
 	boost::system::error_code error_code;
-	REQUEST_CODES requested_code;
-	boost::asio::async_read(*Switch_Request_Socket, boost::asio::buffer(&requested_code, sizeof(requested_code)), [this, &error_code](boost::system::error_code error, std::size_t)
+	/*REQUEST_CODES requested_code;
+	boost::asio::async_read(*Switch_Request_Socket, boost::asio::buffer(&requested_code, sizeof(requested_code)), [this, &error_code](boost::system::error_code error, std::size_t)*/
+	MultipleSwitchRequestsTest* multiple_codes = new MultipleSwitchRequestsTest();
+	boost::asio::async_read(*Switch_Request_Socket, boost::asio::buffer(multiple_codes, sizeof(MultipleSwitchRequestsTest)), [this, &error_code](boost::system::error_code error, std::size_t)
 		{
 			error_code = error;
 			if (error && Should_Hear_Requests)
@@ -259,6 +270,18 @@ void ServerConnection::ListenSwitchRequest()
 		return;
 	}
 
+	std::chrono::time_point<std::chrono::steady_clock, std::chrono::duration<double, std::ratio<1>>> timer_start, timer_end;
+	timer_start = std::chrono::steady_clock::now();
+	for (uint32_t i = 0; i < 100000; i++)
+	{
+		Switch_Request_Receiver.ReceiveRequest(multiple_codes->Request_Codes[i]);
+	}
+	timer_end = std::chrono::steady_clock::now();
+
+	std::chrono::duration<double, std::ratio<1>> timer = timer_end - timer_start;
+	std::cout << "It took " << timer << " to perform 100000 request calls from swtich\n";
+	delete multiple_codes;
+
 	Switch_Loop_Context.post(boost::bind(&ServerConnection::ListenSwitchRequest, this));
 }
 
@@ -266,8 +289,10 @@ void ServerConnection::ListenPointerRequest()
 {
 	boost::system::error_code error_code;
 
-	std::function<void()>* requested_method;
-	boost::asio::async_read(*Pointer_Request_Socket, boost::asio::buffer(&requested_method, sizeof(requested_method)), [this, &error_code](boost::system::error_code error, std::size_t)
+	/*std::function<void()>* requested_method;
+	boost::asio::async_read(*Pointer_Request_Socket, boost::asio::buffer(&requested_method, sizeof(requested_method)), [this, &error_code](boost::system::error_code error, std::size_t)*/
+	MultiplePointerRequestsTest* multiple_methods = new MultiplePointerRequestsTest();
+	boost::asio::async_read(*Pointer_Request_Socket, boost::asio::buffer(multiple_methods, sizeof(MultiplePointerRequestsTest)), [this, &error_code](boost::system::error_code error, std::size_t)
 		{
 			error_code = error;
 			if (error && Should_Hear_Requests)
@@ -283,8 +308,17 @@ void ServerConnection::ListenPointerRequest()
 		return;
 	}
 
-	// Timer start
-	(*requested_method)();
-	
+	std::chrono::time_point<std::chrono::steady_clock, std::chrono::duration<double, std::ratio<1>>> timer_start, timer_end;
+	timer_start = std::chrono::steady_clock::now();
+	for (uint32_t i = 0; i < 100000; i++)
+	{
+		(*multiple_methods->Request_Pointers[i])();
+	}
+	timer_end = std::chrono::steady_clock::now();
+
+	std::chrono::duration<double, std::ratio<1>> timer = timer_end - timer_start;
+	std::cout << "It took " << timer << " to perform 100000 request calls from pointers\n";
+
+	delete multiple_methods;
 	Pointer_Loop_Context.post(boost::bind(&ServerConnection::ListenPointerRequest, this));
 }

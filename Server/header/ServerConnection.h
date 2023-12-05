@@ -12,11 +12,13 @@
 // Project Includes
 #include "Logger.h"
 #include "ConnectionBroadcaster.h"
+#include "SwitchRequestReceiver.h"
+#include "PointerRequestReceiver.h"
 
 class ServerConnection
 {
 public:
-    ServerConnection(std::function<void()>& cancel_connection);
+    ServerConnection();
 	void StartConnection(); 
 	void CancelConnection();
 
@@ -52,7 +54,10 @@ private:
 
 	bool Connected = false;
 	bool KeepAlive = true;
-	std::function<void()>& Cancel_Connection;
+	std::function<void()> Cancel_Connection;
 
 	bool Should_Hear_Requests = false;
+
+	PointerRequestReceiver Pointer_Request_Receiver;
+	SwitchRequestReceiver Switch_Request_Receiver;
 };

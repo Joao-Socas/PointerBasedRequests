@@ -10,13 +10,13 @@
 #include <conio.h>
 #endif
 
-constexpr auto CLEAR_LINE = "\u001b[2k\u001b[1F";
+constexpr auto CLEAR_LINE = "\u001b[1F\u001b[2k";
 
-std::string Logger::Last_Replaced_Message = NULL;
+std::string Logger::Last_Replaced_Message = std::string();
 uint32_t Logger::Replaceble_Message_Lines = 0;
 bool Logger::Replace = false;
 
-void Logger::UpdateMessage(std::string message, bool end_replace = false)
+void Logger::UpdateMessage(std::string message, bool end_replace)
 {
     if (!end_replace && Replace)
     {
@@ -54,10 +54,12 @@ bool Logger::AcceptQuestion(std::string question, bool append_replace)
     {
         Replaceble_Message_Lines += std::ranges::count(question, '\n');
         Last_Replaced_Message.append(question);
+        UpdateMessage(Last_Replaced_Message, true);
     }
     else
     {
         Replace = false;
+        UpdateMessage(question);
     }
 
     char option = NULL;
@@ -75,16 +77,18 @@ bool Logger::AcceptQuestion(std::string question, bool append_replace)
     }
 }
 
-bool Logger::OptionQuestion(std::string question, bool append_replace, std::function<bool(char)>validate_callback)
+void Logger::OptionQuestion(std::string question, bool append_replace, std::function<bool(char)> validate_callback)
 {
     if (append_replace)
     {
         Replaceble_Message_Lines += std::ranges::count(question, '\n');
         Last_Replaced_Message.append(question);
+        UpdateMessage(Last_Replaced_Message, true);
     }
     else
     {
         Replace = false;
+        UpdateMessage(question);
     }
 
     char option = NULL;
@@ -92,7 +96,6 @@ bool Logger::OptionQuestion(std::string question, bool append_replace, std::func
     {
         option = _getch();
     } while (!validate_callback(option));
-
 }
 
 void Logger::CleanLines(uint32_t lines)

@@ -10,10 +10,12 @@ public:
 	void RequestBasicRequestA();
 	void RequestBasicRequestB();
 	void RequestBasicRequestC();
+
+	void MultipleRequestTest();
 	//DataExample RequestDataReceiveRequest();
 	//void RequestDataTransmitRequest(DataExample);
 	//DataExample RequestDataTransceiveRequest(DataExample);
 
 private:
-	ClientConnection& Client_Connection
+	ClientConnection& Client_Connection;
 };

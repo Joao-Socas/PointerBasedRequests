@@ -11,7 +11,7 @@
 #include "Logger.h"
 
 constexpr uint32_t PORT = 27652;
-constexpr auto TIMEOUT_LIMIT = boost::posix_time::millisec(600);
+constexpr auto TIMEOUT_LIMIT = boost::posix_time::millisec(1000);
 
 
 ClientConnection::ClientConnection() : Broadcast_Listener(PORT)
@@ -62,7 +62,7 @@ void ClientConnection::Connect(BroadcastData broadcast_data)
     if (connection_error || cancel_connection)
     {
         if (!cancel_connection)
-            Logger::UpdateMessage(std::string("A connection error ocurred: ").append(connection_error.what()));
+            Logger::UpdateMessage(std::string("A connection error ocurred: ").append(connection_error.what()), true);
         Connected = false;
         return;
     }
@@ -79,18 +79,23 @@ void ClientConnection::Connect(BroadcastData broadcast_data)
     if (connection_error || cancel_connection)
     {
         if (!cancel_connection)
-            Logger::UpdateMessage(std::string("A connection error ocurred: ").append(connection_error.what()));
+            Logger::UpdateMessage(std::string("A connection error ocurred: ").append(connection_error.what()), true);
         Connected = false;
         return;
     }
 
     if ((bool)accepted)
     {
-        Logger::UpdateMessage("Connected to server!");
-        TimeoutConnect(*Pointer_Request_Socket, Request_Context, *Server_Endpoint);
+        Switch_Request_Socket = std::make_unique<boost::asio::ip::tcp::socket>(Request_Context);
         TimeoutConnect(*Switch_Request_Socket, Request_Context, *Server_Endpoint);
-        Keep_Server_Connection_Alive_Thread = std::make_unique<std::thread>(&ClientConnection::KeepServerConnectionAlive, this);
+
+        Pointer_Request_Socket = std::make_unique<boost::asio::ip::tcp::socket>(Request_Context);
+        TimeoutConnect(*Pointer_Request_Socket, Request_Context, *Server_Endpoint);
+        TimeoutRead(*Pointer_Request_Socket, Request_Context, reinterpret_cast<char*>(&Request_Pointers), sizeof(Request_Pointers));
+
         Connected = true;
+        Logger::UpdateMessage("Connected to server!", true);
+        Keep_Server_Connection_Alive_Thread = std::make_unique<std::thread>(&ClientConnection::KeepServerConnectionAlive, this);
         return;
     }
     Logger::UpdateMessage("Connection denied by the server!");
@@ -101,7 +106,7 @@ void ClientConnection::Connect(BroadcastData broadcast_data)
 void ClientConnection::PointerRequestSend(char* buffer, std::size_t buffer_size)
 {
     boost::system::error_code connection_error;
-    boost::asio::write(*Pointer_Request_Socket, boost::asio::buffer(&buffer, buffer_size), connection_error);
+    boost::asio::write(*Pointer_Request_Socket, boost::asio::buffer(buffer, buffer_size), connection_error);
     if (connection_error)
     {
         Logger::UpdateMessage(std::string("Error making pointer request: ").append(connection_error.what()).c_str());
@@ -111,7 +116,7 @@ void ClientConnection::PointerRequestSend(char* buffer, std::size_t buffer_size)
 void ClientConnection::SwitchRequestSend(char* buffer, std::size_t buffer_size)
 {
     boost::system::error_code connection_error;
-    boost::asio::write(*Switch_Request_Socket, boost::asio::buffer(&buffer, buffer_size), connection_error);
+    boost::asio::write(*Switch_Request_Socket, boost::asio::buffer(buffer, buffer_size), connection_error);
     if (connection_error)
     {
         Logger::UpdateMessage(std::string("Error making switch request: ").append(connection_error.what()).c_str());
@@ -247,7 +252,6 @@ bool ClientConnection::TimeoutRead(boost::asio::ip::tcp::socket& socket, boost::
     }
     else if (!in_time)
     {
-
         Logger::UpdateMessage("Connection timed out! The chosen connection target did not respond.");
         return false;
     }

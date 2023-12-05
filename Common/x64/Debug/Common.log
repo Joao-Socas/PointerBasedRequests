@@ -1,0 +1,5 @@
+﻿  Logger.cpp
+F:\Projetos\TCC\Common\Logger.cpp(38,20): warning C4244: 'initializing': conversion from '__int64' to 'uint32_t', possible loss of data
+F:\Projetos\TCC\Common\Logger.cpp(55,55): warning C4244: '+=': conversion from '__int64' to 'uint32_t', possible loss of data
+F:\Projetos\TCC\Common\Logger.cpp(84,55): warning C4244: '+=': conversion from '__int64' to 'uint32_t', possible loss of data
+  Common.vcxproj -> F:\Projetos\TCC\x64\Debug\Common.lib

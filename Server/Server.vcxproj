@@ -145,6 +145,11 @@
     <ClInclude Include="header\ServerConnection.h" />
     <ClInclude Include="header\SwitchRequestReceiver.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.vcxproj">
+      <Project>{b1e05290-c28e-44d5-92c4-ac0eb3969b91}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

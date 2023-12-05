@@ -2,19 +2,63 @@
 //
 
 #include <iostream>
+#include <functional>
+
+#include "Logger.h"
+#include "ClientConnection.h"
+#include "PointerRequester.h"
+#include "SwitchRequester.h"
+
+void SwitchRequestTest(SwitchRequester& switch_requester)
+{
+    switch_requester.MultipleRequestTest();
+}
+
+void PointerRequestTest(PointerRequester& pointer_requester)
+{
+    pointer_requester.MultipleRequestTest();
+}
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    ClientConnection connection;
+    PointerRequester pointer_requester(connection.Request_Pointers, connection);
+    SwitchRequester switch_requester(connection);
+
+    uint32_t menu_option = 0;
+    std::string menu_options;
+    menu_options.append("Choose one of the tests:\n");
+    menu_options.append("1 - Test simple switch requests\n");
+    menu_options.append("2 - Test simple pointer requests\n");
+
+    std::function<bool(char)>validate_callback = [&menu_option](char option) {
+    if (option == 'x')
+    {
+        menu_option = -1;
+        return true; // EXIT
+    }
+    if (option > 47 && option < 58 && (option - 48) < 3)
+    {
+        menu_option = option - 48;
+        return true;
+    }
+    return false;
+    };
+
+    while (menu_option != -1)
+    {
+        //Logger::ReplacebleMessage(menu_options);
+        Logger::OptionQuestion(menu_options, false, validate_callback);
+        switch (menu_option)
+        {
+        case 1:
+            SwitchRequestTest(switch_requester);
+            break;
+        case 2:
+            PointerRequestTest(pointer_requester);
+            break;
+        default:
+            break;
+        }
+    }
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file

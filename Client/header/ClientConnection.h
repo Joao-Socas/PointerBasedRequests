@@ -22,6 +22,7 @@ public:
 	void Connect(BroadcastData broadcast_data);
 	void PointerRequestSend(char* buffer, std::size_t buffer_size);
 	void SwitchRequestSend(char* buffer, std::size_t buffer_size);
+	RequestPointers Request_Pointers;
 
 private:
 	bool TimeoutConnect(boost::asio::ip::tcp::socket& socket, boost::asio::io_context& io_context, boost::asio::ip::tcp::endpoint& endpoint);
@@ -42,6 +43,5 @@ private:
 	bool Connected = false;
 	bool Exiting = false;
 	ClientConnectionParams ConnectionParams = {};
-
 };
 
